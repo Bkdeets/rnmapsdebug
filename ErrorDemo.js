@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Button, Text } from "react-native";
 import MapboxGL from "@rnmapbox/maps";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 MapboxGL.setAccessToken(
 	""
@@ -16,6 +16,30 @@ const STYLES = {
 	DEFAULT: "mapbox://styles/bkdeets/cl9yvwzde001f14o0p8e6ynl1",
 };
 
+const linelayer = {
+	lineLayer: {
+		lineColor: "black",
+		lineCap: "round",
+		lineJoin: "round",
+		lineWidth: 2,
+	},
+};
+
+const goejson = {
+	type: "Feature",
+	geometry: {
+		type: "Polygon",
+		coordinates: [
+			[
+				[-159.834525, 21.860563],
+				[-159.270387, 21.828706],
+				[-159.266868, 22.253662],
+				[-159.805391, 22.255638],
+			],
+		],
+	},
+};
+
 const ErrorDemo = () => {
 	const [styleUrl, setStyleUrl] = useState(STYLES.DEFAULT);
 	const netInfo = useNetInfo();
@@ -26,16 +50,24 @@ const ErrorDemo = () => {
 		console.log(offlineRegion, err);
 
 	const downloadStyle = async (name, styleURL) => {
+		// Kauai bounds: -159.834525,21.860563,-159.265296,22.255757
+
+		// Small Bounds
+		// bounds: [
+		// 	[-159.740155, 22.040740],
+		// 	[-159.512876, 22.234728],
+		// ]
+		MapboxGL.offlineManager.setTileCountLimit(10000000000);
 		try {
 			await MapboxGL.offlineManager.createPack(
 				{
 					name,
 					styleURL,
-					minZoom: 14,
+					minZoom: 8,
 					maxZoom: 20,
 					bounds: [
-						[-159.740155, 22.040740],
-						[-159.512876, 22.234728],
+						[-159.834525, 21.860563],
+						[-159.265296, 22.255757],
 					],
 				},
 				progressListener,
@@ -57,7 +89,7 @@ const ErrorDemo = () => {
 			</View>
 			<Button
 				onPress={() => {
-					downloadStyle("styleSmall", STYLES.STYLE_1);
+					downloadStyle("styleTest5", STYLES.STYLE_1);
 				}}
 				title="Download Style 1"
 				style={styles.button}
@@ -77,9 +109,16 @@ const ErrorDemo = () => {
 				>
 					<MapboxGL.Camera
 						zoomLevel={8}
-						
-						centerCoordinate={[-159.715118,22.131761]}
+						centerCoordinate={[-159.715118, 22.131761]}
 					></MapboxGL.Camera>
+					<MapboxGL.ShapeSource
+						id="bbox"
+						shape={goejson}
+					><MapboxGL.LineLayer
+					id="layer1"
+					style={linelayer.lineLayer}
+				/></MapboxGL.ShapeSource>
+					
 				</MapboxGL.MapView>
 			</View>
 			<Button
@@ -111,19 +150,19 @@ const ErrorDemo = () => {
 				style={styles.button}
 			/>
 			<Button
-			onPress={async () => {
-				await MapboxGL.offlineManager.resetDatabase();
-				await MapboxGL.offlineManager.deletePack('style999')
-				await MapboxGL.offlineManager.deletePack('styleSmall')
-				await MapboxGL.offlineManager.deletePack('style1')
-				await MapboxGL.offlineManager.deletePack('style2')
-				const offlinePacks = await MapboxGL.offlineManager.getPacks();
-				console.log("New Packs", offlinePacks);
-			}}
-			title="RESET DB"
-			style={styles.button}
-		/>
-
+				onPress={async () => {
+					await MapboxGL.offlineManager.resetDatabase();
+					await MapboxGL.offlineManager.deletePack("style999");
+					await MapboxGL.offlineManager.deletePack("styleSmall");
+					await MapboxGL.offlineManager.deletePack("style1");
+					await MapboxGL.offlineManager.deletePack("style2");
+					const offlinePacks =
+						await MapboxGL.offlineManager.getPacks();
+					console.log("New Packs", offlinePacks);
+				}}
+				title="RESET DB"
+				style={styles.button}
+			/>
 		</View>
 	);
 };
@@ -153,5 +192,3 @@ const styles = StyleSheet.create({
 });
 
 export default ErrorDemo;
-
-

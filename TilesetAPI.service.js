@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const url = (tilesetId) => `https://api.mapbox.com/v4/${tilesetId}.json?access_token={your_key}`;
+const url = (tilesetId) => `https://api.mapbox.com/v4/${tilesetId}.json?access_token={}`;
 
 export const getTileset = async (tilesetId) => {
     let result = null;
@@ -12,4 +12,3 @@ export const getTileset = async (tilesetId) => {
     }
     return result;
 }
-

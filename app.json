@@ -32,7 +32,7 @@
         "@rnmapbox/maps",
         {
           "RNMapboxMapsImpl": "mapbox-gl",
-          "RNMapboxMapsDownloadToken": "{your_key}"
+          "RNMapboxMapsDownloadToken": ""
         }
       ]
     ],
